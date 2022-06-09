@@ -26,7 +26,6 @@ class SQLQuery
 
     private function dropTable()
     {
-
         $table = $this->source->getDropTables()[$this->table];
         $statement = $this->db->query($table);
     }

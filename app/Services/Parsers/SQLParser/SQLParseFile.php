@@ -26,7 +26,9 @@ class SQLParseFile
 
     protected function readFile()
     {
-        $this->str = file_get_contents(Storage::path($this->file->url));
+        if (!$this->str = file_get_contents(Storage::path($this->file->url))){
+            throw new \Exception("Файл {$this->file->url} пустой");
+        }
     }
 
     protected function parse()
@@ -71,6 +73,10 @@ class SQLParseFile
     }
     public function getInsertTables()
     {
+        if (count($this->insert_tables) == 0)
+        {
+            throw new \Exception("Не найдено ни одной таблицы для вставки в файле {$this->file->url}");
+        }
         return $this->insert_tables;
     }
     public function getTableName()

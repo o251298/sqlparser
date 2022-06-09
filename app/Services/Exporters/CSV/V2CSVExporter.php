@@ -1,6 +1,7 @@
 <?php
-
-
+/**
+ * @author Oleg (251298@gmail.com)
+ */
 namespace App\Services\Exporters\CSV;
 
 
@@ -37,7 +38,6 @@ class V2CSVExporter extends BasicExporter implements IExport
             Storage::delete(substr($this->file_name, strpos($this->file_name, 'public')));
         }
         $this->file = fopen($this->file_name, 'a+');
-
     }
 
     private function closeFile()
@@ -50,6 +50,9 @@ class V2CSVExporter extends BasicExporter implements IExport
         $this->closeFile();
     }
 
+    /**
+     * @return string
+     */
     public function getLink()
     {
         return $this->link;

@@ -25,6 +25,7 @@ class FileSQLParse
         $this->files = $files;
         $this->format = $format;
         $this->table = $table;
+
         $this->saveToOneFile = $saveToOneFile;
     }
 
@@ -40,28 +41,25 @@ class FileSQLParse
         foreach ($this->getFileObj() as $file)
         {
             $sqlParser = new SQLParseFile($file);
-            foreach (array_keys($sqlParser->getInsertTables()) as $tableName)
-            {
-                if (SQLParseFile::checkPostsTable($tableName, $this->table))
+            try {
+                foreach (array_keys($sqlParser->getInsertTables()) as $tableName)
                 {
-                    $sql = new  SQLQuery($sqlParser, $tableName);
-                    if ($this->saveToOneFile)
+                    if (SQLParseFile::checkPostsTable($tableName, $this->table))
                     {
-                        $this->allTables = array_merge($this->allTables, $sql->select);
-                    } else {
-                        // select type
-                        switch ($this->format){
-                            case ('csv'):
-                                $source = new V2CSVExporter($sql->select, $file->name . '_' . $sql->table);
-                                break;
-                            case ("xml"):
-                                $source = new XMLExporter($sql->select, $file->name . '_' . $sql->table);
-                                break;
+                        $sql = new  SQLQuery($sqlParser, $tableName);
+                        if ($this->saveToOneFile)
+                        {
+                            $this->allTables = array_merge($this->allTables, $sql->select);
+                        } else {
+                            // select type
+                            $exporter = ExportsClient::setSource($this->format, $sql->select, $file->name . '_' . $sql->table);
+                            $this->response[$file->name][] = $exporter->getLink();
                         }
-                        $exporter = new ExportsClient($source);
-                        $this->response[$file->name][] = $exporter->getLink();
                     }
                 }
+            } catch (\Exception $exception)
+            {
+                dump($exception);
             }
         }
     }

@@ -1,9 +1,9 @@
 <?php
-
+/**
+ * @author Oleg (251298@gmail.com)
+ */
 
 namespace App\Services\Exporters\XML;
-
-
 use App\Services\Exporters\BasicExporter;
 use App\Services\Exporters\IExport;
 use DOMDocument;
@@ -36,10 +36,16 @@ class XMLExporter extends BasicExporter implements IExport
             $root->appendChild($movie_node);
             $this->file->appendChild($root);
         }
-
+        if (file_exists('../storage/app/' . self::PATH . '/' .  $this->filename . '_' . date('Y_m_d') . '.xml')) {
+            Storage::delete(self::PATH . '/' .  $this->filename . '_' . date('Y_m_d') . '.xml');
+        }
         Storage::put(self::PATH . '/' .  $this->filename . '_' . date('Y_m_d') . '.xml', $this->file->saveXml());
         $this->link = self::PATH . '/' .  $this->filename . '_' . date('Y_m_d') . '.xml';
     }
+
+    /*
+     * @return string
+     */
     public function getLink()
     {
         return $this->link;

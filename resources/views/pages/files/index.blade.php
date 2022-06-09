@@ -2,6 +2,9 @@
 @section('title', 'Список всых баз')
 @section('content')
     <div class="content">
+        @if(session('error'))
+            <div class="alert alert-danger">{{session('error')}}</div>
+        @endif
         @if(count($files) > 0)
             <form action="{{route('files.parse')}}" method="post">
                 @csrf

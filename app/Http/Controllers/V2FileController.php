@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Services\Exporters\CSV\V2CSVExporter;
 use App\Services\Exporters\XML\XMLExporter;
 use App\Services\Exporters\ExportsClient;
+use Illuminate\Support\Facades\Session;
 
 class V2FileController extends FileController
 {
@@ -42,20 +43,19 @@ class V2FileController extends FileController
         $all = false;
         if ($request->select === "yes") $all = true;
         $files_parsing = new FileSQLParse($request->get('file_to_parse'), $all, $request->export_format, $request->table);
-        $files_parsing->parse();
-        if ($files_parsing->saveToOneFile())
-        {
-            switch ($request->export_format){
-                case ("csv"):
-                    $source = new V2CSVExporter($files_parsing->getAllTables(), 'export_all_' . date('Y_m_d'));
-                    break;
-                case ("xml"):
-                    $source = new XMLExporter($files_parsing->getAllTables(), 'export_all_' . date('Y_m_d'));
-                    break;
+        try {
+            $files_parsing->parse();
+            if ($files_parsing->saveToOneFile())
+            {
+                $exporter = ExportsClient::setSource($request->export_format, $files_parsing->getAllTables(), 'export_all_' . date('Y_m_d'));
+                return Storage::download($exporter->getLink());
             }
-            $exporter = new ExportsClient($source);
-            return Storage::download($exporter->getLink());
+        } catch (\Exception $exception)
+        {
+            Session::flash('error', "{$exception->getMessage()} IN FILE: {$exception->getFile()} IN LINE {$exception->getLine()}");
+            return redirect()->back();
         }
+
         return view('pages.files.upload', ['files' => $files_parsing->getResponse()]);
     }
 

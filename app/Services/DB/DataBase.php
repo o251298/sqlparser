@@ -1,11 +1,16 @@
 <?php
-
+/**
+ * @author Oleg (251298@gmail.com)
+ */
 
 namespace App\Services\DB;
 use PDO;
 
 class DataBase
 {
+    /**
+     * @return PDO
+     */
     public static function connect()
     {
         $dsn = 'mysql:dbname=sqlparser;host=db';
