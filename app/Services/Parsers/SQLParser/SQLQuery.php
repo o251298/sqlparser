@@ -22,8 +22,6 @@ class SQLQuery
         $this->createTable();
         $this->insertTable();
         $this->selectTable();
-        //$this->csv();
-
     }
 
     private function dropTable()
@@ -51,8 +49,6 @@ class SQLQuery
     {
         $sql = "SELECT * FROM $this->table";
         $s = $this->db->query($sql);
-        //$key = $this->source->getTableName() . '^%^' . $this->table;
-        //$this->select[$key] = $s->fetchAll(\PDO::FETCH_ASSOC);
         $i = 0;
         while ($row = $s->fetch())
         {

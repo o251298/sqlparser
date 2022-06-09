@@ -38,7 +38,7 @@
                                 <input class="form-check-input" type="radio" name="select" id="no" value="no" checked>
                             </td>
                             <td>
-                                <input type="text" class="form-control" value="posts" disabled name="table">
+                                <input type="text" class="form-control" value="posts" readonly name="table">
                             </td>
                             <td>
                                 <select class="form-select" name="export_format">

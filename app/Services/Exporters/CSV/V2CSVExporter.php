@@ -16,7 +16,6 @@ class V2CSVExporter extends BasicExporter implements IExport
     {
         parent::__construct($data, $filename);
         $this->openFile();
-        $this->export();
     }
 
     public function export()
