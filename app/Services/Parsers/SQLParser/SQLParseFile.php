@@ -5,6 +5,7 @@ namespace App\Services\Parsers\SQLParser;
 
 
 use App\Models\File;
+use Illuminate\Support\Facades\Storage;
 use function Symfony\Component\Translation\t;
 
 class SQLParseFile
@@ -25,7 +26,7 @@ class SQLParseFile
 
     protected function readFile()
     {
-        $this->str = file_get_contents($this->file->url);
+        $this->str = file_get_contents(Storage::path($this->file->url));
     }
 
     protected function parse()
@@ -80,9 +81,9 @@ class SQLParseFile
     {
         return $this->setVal;
     }
-    public static function checkPostsTable($str)
+    public static function checkPostsTable($str, $table = 'posts')
     {
-        if (preg_match('/posts/', $str)) return true;
+        if (preg_match("/$table/", $str)) return true;
     }
 }
 

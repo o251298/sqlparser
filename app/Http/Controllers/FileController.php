@@ -3,11 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\File;
-use App\Services\DB\DataBase;
-use App\Services\ExporterClient;
+use Illuminate\Support\Facades\Session;
 use App\Services\Exporters\CSVExporter;
 use App\Services\Parsers\SQLParser\SQLParseFile;
-use App\Services\Parsers\SQLParser\SQLParser;
 use App\Services\Parsers\SQLParser\SQLQuery;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -42,12 +40,18 @@ class FileController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(FileRequest $request)
     {
         if($request->hasfile('file'))
         {
             foreach($request->file('file') as $file)
             {
+                $typeFromName = substr($file->getClientOriginalName(), strlen($file->getClientOriginalName()) - 3); // example database.sql
+                if ($typeFromName != "sql")
+                {
+                    Session::flash('error', 'Файл повинен бути SQL');
+                    return redirect()->back();
+                }
                 $folder = 'uploads';
                 $name = $time = date('Y-m-d_H:m') . '_' .$file->getClientOriginalName();
                 $file->move(public_path($folder), $name);
@@ -57,9 +61,8 @@ class FileController extends Controller
                 ]);
                 $data[] = $sql_file;
             }
+            $serialize = serialize($data);
         }
-        dd(1);
-        $serialize = serialize($data);
         return redirect()->back()->with('files', $serialize);
     }
 

@@ -1,6 +1,6 @@
 <?php
 
-
+// UNWORK VIRSION
 namespace App\Services\Exporters;
 
 
@@ -15,7 +15,7 @@ class CSVExporter
     {
         $this->data = $data;
         $this->filename = $filename;
-        $this->export();
+        //$this->export();
     }
 
     public function export()

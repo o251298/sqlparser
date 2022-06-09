@@ -62,27 +62,10 @@ class SQLQuery
             }
             $i++;
         }
+        $this->dropAfterSelect("DROP TABLE $this->table");
     }
-
-    protected function csv()
+    private function dropAfterSelect($sql)
     {
-        //$path = '../uploads/' . date('Y-m-d_H_i') . 'test.csv';
-//        $path = public_path() . '/uploads/';
-//        if (!is_dir($path)) mkdir($path, 0777,true);
-//        $f = fopen($path . $this->source->getTableName() . '.csv', 'a+');
-        $filename = $this->source->getTableName() . '_' . date('Y-m-d') . 'csv';
-        $f = fopen('php://memory', 'a+');
-        $delimiter = ';'; //parameter for fputcsv
-        $enclosure = '"'; //parameter for fputcsv
-
-        foreach ($this->select as $fields){
-            fputcsv($f, $fields, $delimiter, $enclosure);
-        }
-        fseek($f, 0);
-        header('Content-Type: text:csv');
-        header('Content-Disposition: attachment; filename="' . $filename .'";');
-        fpassthru($f);
-
-        fclose($f);
+        $this->db->query($sql);
     }
 }
