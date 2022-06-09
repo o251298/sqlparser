@@ -1,4 +1,5 @@
 @extends('layouts.master')
+@section('title', 'Створити базу')
 @section('content')
     <div class="content">
         <!-- HAS ERROR -->

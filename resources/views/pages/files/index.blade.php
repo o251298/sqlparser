@@ -1,9 +1,7 @@
 @extends('layouts.master')
+@section('title', 'Список всых баз')
 @section('content')
     <div class="content">
-
-        <a href="{{route('files.create')}}" class="btn btn-primary">Загпузить файл(ы)</a>
-
         @if(count($files) > 0)
             <form action="{{route('files.parse')}}" method="post">
                 @csrf
@@ -59,6 +57,10 @@
                 </table>
                 <button class="btn btn-success">Парсить</button>
             </form>
+        @else
+            <div>
+                <p>Файлов еще нету... <a href="{{route('files.create')}}">Загрузить</a></p>
+            </div>
         @endif
 
     </div>

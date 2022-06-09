@@ -1,12 +1,13 @@
 @extends('layouts.master')
+@section('title', 'Результати парсингу')
 @section('content')
     <div class="content">
         <table class="table">
             <thead>
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">База данных</th>
-                <th scope="col">Скачать</th>
+                <th scope="col">Бази данних</th>
+                <th scope="col">Завантажити</th>
             </tr>
             </thead>
             <tbody>
@@ -19,7 +20,7 @@
                         <form action="{{route('download')}}" method="post">
                             @csrf
                             <input type="hidden" name="link" value="{{$file}}">
-                            <button class="btn btn-outline-success">Скачать</button>
+                            <button class="btn btn-outline-success">Завантажити</button>
                         </form>
                     @endforeach
                 </td>

@@ -9,14 +9,11 @@ use App\Models\File;
 use App\Models\FileSQLParse;
 use App\Models\FileStore;
 use App\Models\FileValidation;
-use App\Services\Exporters\CSVExporter;
-use App\Services\Exporters\V2CSVExporter;
-use App\Services\Parsers\SQLParser\SQLParseFile;
-use App\Services\Parsers\SQLParser\SQLQuery;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
+use App\Services\Exporters\CSV\V2CSVExporter;
 use App\Services\Exporters\XML\XMLExporter;
+use App\Services\Exporters\ExportsClient;
 
 class V2FileController extends FileController
 {
@@ -48,7 +45,15 @@ class V2FileController extends FileController
         $files_parsing->parse();
         if ($files_parsing->saveToOneFile())
         {
-            $exporter = new V2CSVExporter($files_parsing->getAllTables(), 'export_all_' . date('Y_m_d'));
+            switch ($request->export_format){
+                case ("csv"):
+                    $source = new V2CSVExporter($files_parsing->getAllTables(), 'export_all_' . date('Y_m_d'));
+                    break;
+                case ("xml"):
+                    $source = new XMLExporter($files_parsing->getAllTables(), 'export_all_' . date('Y_m_d'));
+                    break;
+            }
+            $exporter = new ExportsClient($source);
             return Storage::download($exporter->getLink());
         }
         return view('pages.files.upload', ['files' => $files_parsing->getResponse()]);

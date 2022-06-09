@@ -14,10 +14,7 @@ use App\Http\Controllers\V2FileController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-Route::get('/files/index', [FileController::class, 'index'])->name('files.list');
+Route::get('/', [FileController::class, 'index'])->name('files.list');
 Route::get('/files/create', [FileController::class, 'create'])->name('files.create');
 Route::get('/files/select', [FileController::class, 'selectTable'])->name('files.select.table');
 Route::post('/files/parse', [V2FileController::class, 'parse'])->name('files.parse');

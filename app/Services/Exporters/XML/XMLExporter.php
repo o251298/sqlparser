@@ -22,16 +22,17 @@ class XMLExporter extends BasicExporter implements IExport
 
     public function export()
     {
-        $root = $this->file->createElement('Posts');
+        $root = $this->file->createElement('posts');
         foreach ($this->data as $key => $item)
         {
             $movie_node = $this->file->createElement('post');
             $attr_movie_id = new DOMAttr('post_id', $key);
             $movie_node->setAttributeNode($attr_movie_id);
-            $child_node_title = $this->file->createElement('Title', $item['post_title']);
-            $child_node_content = $this->file->createElement('Content', $item['post_content']);
+            $child_node_title = $this->file->createElement('title', $item['post_title']);
+            $description = $this->file->appendChild($this->file->createElement('content'));
+            $description->appendChild($this->file->createCDATASection($item['post_content']));
             $movie_node->appendChild($child_node_title);
-            $movie_node->appendChild($child_node_content);
+            $movie_node->appendChild($description);
             $root->appendChild($movie_node);
             $this->file->appendChild($root);
         }
