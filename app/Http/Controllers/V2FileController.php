@@ -70,5 +70,13 @@ class V2FileController extends FileController
         $file->delete();
         return redirect()->back();
     }
+    public function truncate()
+    {
+        $path = array('public/csv', 'public/xml');
+        foreach ($path as $item) {
+            Storage::deleteDirectory($item);
+        }
+        return redirect()->route('files.list');
+    }
 
 }

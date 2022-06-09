@@ -22,4 +22,5 @@ Route::post('/files/store', [V2FileController::class, 'store'])->name('files.sto
 Route::post('/sql/create', [FileController::class, 'sql'])->name('sql.create');
 Route::post('/download/', [V2FileController::class, 'download'])->name('download');
 Route::get('/files/destroy/{file}', [V2FileController::class, 'destroy'])->name('destroy');
+Route::get('/files/truncate', [V2FileController::class, 'truncate'])->name('truncate');
 
