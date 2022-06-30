@@ -59,7 +59,8 @@ class FileSQLParse
                 }
             } catch (\Exception $exception)
             {
-                dump($exception);
+                echo $exception->getMessage();
+                die();
             }
         }
     }

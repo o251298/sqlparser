@@ -17,7 +17,7 @@ class FileStore
         $this->file = $file;
     }
 
-    public function save()
+    public function save() : File
     {
         $this->file->storeAs($this->path , $this->file->getClientOriginalName());
         $file = File::create([

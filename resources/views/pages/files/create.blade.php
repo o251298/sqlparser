@@ -1,5 +1,5 @@
 @extends('layouts.master')
-@section('title', 'Створити базу')
+@section('title', 'Create databases')
 @section('content')
     <div class="content">
         <!-- HAS ERROR -->
@@ -15,7 +15,7 @@
         @if (session('files'))
                     <div class="alert alert-success">
                         <p>
-                            Базы успешно загрузились.
+                            Upload success
                         </p>
                     </div>
                 <form action="{{route('files.parse')}}" method="post">
@@ -24,18 +24,18 @@
                         <thead>
                         <tr>
                             <th scope="col">Filter</th>
-                            <th scope="col">Выгрузить одним файлом?</th>
-                            <th scope="col">Искать таблицу</th>
-                            <th scope="col">Формат выгрузки</th>
+                            <th scope="col">Download one file?</th>
+                            <th scope="col">Select table</th>
+                            <th scope="col">Format download</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr>
                             <th scope="row">#</th>
                             <td>
-                                <label for="yes">Да</label>
+                                <label for="yes">Yes</label>
                                 <input class="form-check-input" type="radio" name="select" id="yes" value="yes">
-                                <label for="no">Нет</label>
+                                <label for="no">No</label>
                                 <input class="form-check-input" type="radio" name="select" id="no" value="no" checked>
                             </td>
                             <td>
@@ -55,9 +55,9 @@
                             <thead>
                             <tr>
                                 <th scope="col">id</th>
-                                <th scope="col">База данных</th>
-                                <th scope="col">Выбрать</th>
-                                <th scope="col">Удалить</th>
+                                <th scope="col">Databases</th>
+                                <th scope="col">Select</th>
+                                <th scope="col">Delete</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -66,12 +66,12 @@
                                     <th scope="row">{{$item->id}}</th>
                                     <td>{{$item->name}}</td>
                                     <td><input id="chexbox" type="checkbox" name="file_to_parse[]"  value="{{$item->id}}" checked></td>
-                                    <td> <a href="{{route('destroy', [$item])}}" class="btn btn-danger">DELETE</a></td>
+                                    <td> <a href="{{route('destroy', [$item])}}" class="btn btn-danger">Delete</a></td>
                                 </tr>
                             @endforeach
                             </tbody>
                         </table>
-                    <button class="btn btn-success">Парсить</button>
+                    <button class="btn btn-success">Parse</button>
                 </form>
         @endif
         <!-- END SUCCESS UPLOAD -->
@@ -84,7 +84,7 @@
                 <input multiple type="file" name="file[]" class="form-control" id="inputGroupFile02">
                 <label class="input-group-text" for="inputGroupFile02">Upload</label>
             </div>
-            <button class="btn btn-primary">Загрузить файл(ы)</button>
+            <button class="btn btn-primary">Upload file(s)</button>
         </form>
         <!-- END FILE UPLOAD -->
     </div>

@@ -3,152 +3,88 @@
 namespace App\Http\Controllers;
 
 use App\Models\File;
-use Illuminate\Support\Facades\Session;
-use App\Services\Exporters\CSVExporter;
-use App\Services\Parsers\SQLParser\SQLParseFile;
-use App\Services\Parsers\SQLParser\SQLQuery;
+use App\Models\FileSQLParse;
+use App\Models\FileStore;
+use App\Models\FileValidation;
+use App\Services\Exporters\ExportsClient;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\FileRequest;
 
 class FileController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function index()
     {
-        $files = File::all();
-        return view('pages.files.index', ['files' => $files]);
+        return view('pages.files.index', ['files' => File::all()]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         return view('pages.files.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(FileRequest $request)
     {
         if($request->hasfile('file'))
         {
             foreach($request->file('file') as $file)
             {
-                $typeFromName = substr($file->getClientOriginalName(), strlen($file->getClientOriginalName()) - 3); // example database.sql
-                if ($typeFromName != "sql")
-                {
-                    Session::flash('error', 'Файл повинен бути SQL');
-                    return redirect()->back();
-                }
-                $folder = 'uploads';
-                $name = $time = date('Y-m-d_H:m') . '_' .$file->getClientOriginalName();
-                $file->move(public_path($folder), $name);
-                $sql_file = File::create([
-                    'name' => $file->getClientOriginalName(),
-                    'url' => "../public/$folder/" . $name
-                ]);
-                $data[] = $sql_file;
+                FileValidation::checkType($file);
+                FileValidation::checkUnique($file);
+                if(FileValidation::$errors) return redirect()->back();
+                $uploadFile = new FileStore($file);
+                $data[] = $uploadFile->save();
             }
-            $serialize = serialize($data);
         }
-        return redirect()->back()->with('files', $serialize);
+        return redirect()->back()->with('files', serialize($data));
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\File  $file
-     * @return \Illuminate\Http\Response
-     */
-    public function show(File $file)
+    public function truncate()
     {
-        //
+        foreach (['public/csv', 'public/xml'] as $path) {
+            Storage::deleteDirectory($path);
+        }
+        return redirect()->route('files.list');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\File  $file
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(File $file)
+    public function download(Request $request)
     {
-        //
+        return Storage::download($request->link);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\File  $file
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, File $file)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\File  $file
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(File $file)
     {
-        //
+        Storage::delete($file->url);
+        $file->delete();
+        return redirect()->back();
     }
 
     public function parse(Request $request)
     {
-        dd(1);
-        $response = [];
-        // select what method to export data (csv, xml, txt)
-        // if isset EXPORT_TO_ONE_FILE -> to export one file (array_merge())
+        // if none files = error
+        if (empty($request->get('file_to_parse'))) return redirect()->back()->with('error', 'Empty files');
+        // flag to download all to one file
+        $all = false;
+        //
+        if ($request->select === "yes") $all = true;
+        $files_parsing = new FileSQLParse($request->get('file_to_parse'), $all, $request->export_format, $request->table);
 
-        $files = $request->get('file_to_parse');
-        foreach (array_values($files) as $file_id) {
-            $obj_files[] = File::find($file_id);
-        }
-        foreach ($obj_files as $file)
-        {
-            $sqlParser = new SQLParseFile($file);
-            foreach (array_keys($sqlParser->getInsertTables()) as $tableName)
+        try {
+            $files_parsing->parse();
+            if ($files_parsing->saveToOneFile())
             {
-                if (SQLParseFile::checkPostsTable($tableName))
-                {
-                    $sql = new  SQLQuery($sqlParser, $tableName);
-                    $exporter = new CSVExporter($sql->select, $sql->table);
-                    $response[$file->name][] = $exporter->getLink();
-                    Storage::download($exporter->getLink());
-                }
+                $exporter = ExportsClient::setSource($request->export_format, $files_parsing->getAllTables(), ExportsClient::$allTableName . date('Y_m_d'));
+                return Storage::download($exporter->getLink());
+            } else {
+                return view('pages.files.upload', ['files' => $files_parsing->getResponse()]);
             }
-        }
-        return view('pages.files.upload', ['files' => $response]);
-
-    }
-
-
-
-    public function sql(Request $request)
-    {
-        $sqls = $request->get('sql');
-        foreach ($sqls as $obj)
+        } catch (\Exception $exception)
         {
-            $sql = unserialize($obj);
-            dump($sql);
+            Session::flash('error', "{$exception->getMessage()} IN FILE: {$exception->getFile()} IN LINE {$exception->getLine()}");
+            return redirect()->back();
         }
     }
+
 }

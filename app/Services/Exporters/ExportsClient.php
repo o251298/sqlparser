@@ -12,6 +12,7 @@ use App\Services\Exporters\XML\XMLExporter;
 class ExportsClient
 {
     public $source;
+    public static $allTableName = 'export_all_';
 
     public function __construct(IExport $source)
     {
