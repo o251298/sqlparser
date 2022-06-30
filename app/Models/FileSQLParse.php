@@ -29,14 +29,14 @@ class FileSQLParse
         $this->saveToOneFile = $saveToOneFile;
     }
 
-    private function getFileObj()
+    private function getFileObj() : \Generator
     {
         foreach (array_values($this->files) as $file_id) {
             yield File::find($file_id);
         }
     }
 
-    public function parse()
+    public function parse() : void
     {
         foreach ($this->getFileObj() as $file)
         {
@@ -64,17 +64,18 @@ class FileSQLParse
             }
         }
     }
+
     public function getResponse()
     {
         return $this->response;
     }
 
-    public function saveToOneFile()
+    public function saveToOneFile() : bool
     {
         return $this->saveToOneFile;
     }
 
-    public function getAllTables()
+    public function getAllTables() : array
     {
         return $this->allTables;
     }

@@ -24,14 +24,15 @@ class SQLParseFile
         $this->parse();
     }
 
-    protected function readFile()
+    public function readFile()
     {
         if (!$this->str = file_get_contents(Storage::path($this->file->url))){
             throw new \Exception("Файл {$this->file->url} пустой");
         }
+        return true;
     }
 
-    protected function parse()
+    public function parse() : void
     {
         foreach (SQLParser::getQueries($this->str) as $item)
         {
@@ -63,15 +64,15 @@ class SQLParseFile
         }
     }
 
-    public function getCreateTables()
+    public function getCreateTables() : array
     {
         return $this->create_tables;
     }
-    public function getDropTables()
+    public function getDropTables() : array
     {
         return $this->drop_tables;
     }
-    public function getInsertTables()
+    public function getInsertTables() : array
     {
         if (count($this->insert_tables) == 0)
         {
@@ -79,17 +80,18 @@ class SQLParseFile
         }
         return $this->insert_tables;
     }
-    public function getTableName()
+    public function getTableName() : string
     {
         return $this->file->name;
     }
-    public function getSetVal()
+    public function getSetVal() : array
     {
         return $this->setVal;
     }
-    public static function checkPostsTable($str, $table = 'posts')
+    public static function checkPostsTable($str, $table = 'posts') : bool
     {
         if (preg_match("/$table/", $str)) return true;
+        return false;
     }
 }
 
